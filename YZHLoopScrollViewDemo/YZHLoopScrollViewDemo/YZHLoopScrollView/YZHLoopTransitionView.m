@@ -8,42 +8,45 @@
 
 #import "YZHLoopTransitionView.h"
 
-
 /**********************************************************************
- *_YZHPanInfo
+ *YZHLoopTransitionContext
  ***********************************************************************/
-@interface _YZHPanInfo : NSObject
+@implementation YZHLoopTransitionContext
 
-@property (nonatomic, assign) CGFloat changedRatio;
+@synthesize transitionContainerView = _transitionContainerView;
 
-@property (nonatomic, strong) UIView *panContainerView;
-
-
-@end
-
-@implementation _YZHPanInfo
-
-- (UIView *)panContainerView
+- (instancetype)init
 {
-    if (_panContainerView == nil) {
-        _panContainerView = [UIView new];
-        _panContainerView.clipsToBounds = YES;
-        _panContainerView.userInteractionEnabled = NO;
+    self = [super init];
+    if (self) {
+        [self _setupDefault];
     }
-    return _panContainerView;
+    return self;
+}
+
+- (void)_setupDefault
+{
+    self.animateTimeInterval = 0.25;
+}
+
+- (UIView *)transitionContainerView
+{
+    if (_transitionContainerView == nil) {
+        _transitionContainerView = [UIView new];
+        _transitionContainerView.clipsToBounds = YES;
+        _transitionContainerView.userInteractionEnabled = NO;
+    }
+    return _transitionContainerView;
 }
 
 @end
-
-
-
 
 /**********************************************************************
  *YZHLoopTransitionView
  ***********************************************************************/
 @interface YZHLoopTransitionView () <UIGestureRecognizerDelegate>
 
-@property (nonatomic, strong) _YZHPanInfo *panInfo;
+@property (nonatomic, strong) YZHLoopTransitionContext *panInfo;
 
 @property (nonatomic, strong) UIPanGestureRecognizer *pan;
 
@@ -89,16 +92,16 @@
     self.loopScrollView.backgroundColor = [UIColor clearColor];
     [self addSubview:self.loopScrollView];
     
-    UIPanGestureRecognizer *pan = [[UIPanGestureRecognizer alloc] initWithTarget:self action:@selector(_panAction:)];
+    UIPanGestureRecognizer *pan = [[UIPanGestureRecognizer alloc] initWithTarget:self action:@selector(panGestureRecognizerAction:)];
     pan.delegate = self;
     [self addGestureRecognizer:pan];
     self.pan = pan;
 }
 
-- (_YZHPanInfo *)panInfo
+- (YZHLoopTransitionContext *)panInfo
 {
     if (_panInfo == nil) {
-        _panInfo = [_YZHPanInfo new];
+        _panInfo = [YZHLoopTransitionContext new];
     }
     return _panInfo;
 }
@@ -131,10 +134,10 @@
     if (panGesture.state == UIGestureRecognizerStateBegan) {
 
         CGPoint anchorPoint =  CGPointMake(loc.x/contentSize.width, loc.y/contentSize.height);
-        self.panInfo.panContainerView.layer.anchorPoint = anchorPoint;
-        self.panInfo.panContainerView.frame = self.bounds;
-        [self.panInfo.panContainerView addSubview:self.loopScrollView];
-        [self.superview addSubview:self.panInfo.panContainerView];
+        self.panInfo.transitionContainerView.layer.anchorPoint = anchorPoint;
+        self.panInfo.transitionContainerView.frame = self.bounds;
+        [self.panInfo.transitionContainerView addSubview:self.loopScrollView];
+        [self.superview addSubview:self.panInfo.transitionContainerView];
         
         if ([self.delegate respondsToSelector:@selector(transitionView:didStartAtPoint:)]) {
             [self.delegate transitionView:self didStartAtPoint:loc];
@@ -146,8 +149,8 @@
             
         ratio = fmax(self.minScale, ratio);
         
-        self.panInfo.panContainerView.transform = CGAffineTransformMakeScale(ratio, ratio);
-        self.panInfo.panContainerView.center = loc;
+        self.panInfo.transitionContainerView.transform = CGAffineTransformMakeScale(ratio, ratio);
+        self.panInfo.transitionContainerView.center = loc;
         self.alpha = ratio;
         self.panInfo.changedRatio = ratio;
         if ([self.delegate respondsToSelector:@selector(transitionView:updateAtPoint:changedValue:)]) {
@@ -159,7 +162,7 @@
         self.alpha = 1.0;
         [self addSubview:self.loopScrollView];
         self.loopScrollView.frame = self.bounds;
-        [self.panInfo.panContainerView removeFromSuperview];
+        [self.panInfo.transitionContainerView removeFromSuperview];
 
         if (self.panInfo.changedRatio < self.minScaleToRemove) {
             [self removeFromSuperview];
@@ -179,6 +182,15 @@
 {
     _enableTransition = enableTransition;
     self.pan.enabled = enableTransition;
+}
+
+#pragma mark public can override
+
+- (void)panGestureRecognizerAction:(UIPanGestureRecognizer*)panGestureRecognizer
+{
+    if ([[self class] isEqual:[YZHLoopTransitionView class]]) {
+        [self _panAction:panGestureRecognizer];
+    }
 }
 
 - (BOOL)panGestureRecognizer:(UIPanGestureRecognizer *)gestureRecognizer shouldRecognizeSimultaneouslyWithGestureRecognizer:(UIPanGestureRecognizer *)otherPanGestureRecognizer

@@ -32,8 +32,8 @@
     [super layoutSubviews];
     if (!CGRectEqualToRect(self.scrollView.frame, self.bounds)) {
         self.scrollView.frame = self.bounds;
-        [self _updateZoomImageView:self.scrollView.zoomScale];
     }
+    [self _updateZoomImageView:self.scrollView.zoomScale];
 }
 
 - (UIScrollView *)scrollView
@@ -59,6 +59,7 @@
 - (void)_setupZoomImageViewChildView
 {
     [self addSubview:self.scrollView];
+    self.scrollView.frame = self.bounds;
     [self.scrollView addSubview:self.imageView];
 }
 
@@ -79,20 +80,25 @@
 - (void)_updateZoomImageView:(CGFloat)zoomScale
 {
     self.scrollView.zoomScale = zoomScale;
-    self.scrollView.contentSize = self.scrollView.bounds.size;
-    
+
     CGSize scrollViewSize = self.scrollView.bounds.size;
     if (scrollViewSize.width == 0 || scrollViewSize.height == 0) {
         return;
     }
-    CGSize contentSize = [self.imageView contentImageSizeInSize:self.scrollView.bounds.size];
+    
+    CGSize scrollContentSize = self.scrollView.contentSize;
+    CGFloat w = MAX(scrollContentSize.width, scrollViewSize.width);
+    CGFloat h = MAX(scrollContentSize.height, scrollViewSize.height);
+    scrollContentSize = CGSizeMake(w, h);
+    
+    CGSize contentSize = [self.imageView contentImageSizeInSize:scrollContentSize];
     
     if (contentSize.width == 0 || contentSize.height == 0) {
         return;
     }
     
-    CGFloat x = (self.scrollView.bounds.size.width - contentSize.width)/2;
-    CGFloat y = (self.scrollView.bounds.size.height - contentSize.height)/2;
+    CGFloat x = (scrollContentSize.width - contentSize.width)/2;
+    CGFloat y = (scrollContentSize.height - contentSize.height)/2;
     
     self.imageView.frame = CGRectMake(x, y, contentSize.width, contentSize.height);
 }

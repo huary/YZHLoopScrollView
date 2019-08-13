@@ -18,6 +18,8 @@ NS_ASSUME_NONNULL_BEGIN
 
 @property (nonatomic, copy) YZHImageCellUpdateBlock didUpdateBlock;
 
+@property (nonatomic, copy) YZHImageCellDismissToImageViewBlock dismissToImageViewBlock;
+
 @property (nonatomic, copy) NSString *imageName;
 
 @property (nonatomic, strong) UIImage *image;

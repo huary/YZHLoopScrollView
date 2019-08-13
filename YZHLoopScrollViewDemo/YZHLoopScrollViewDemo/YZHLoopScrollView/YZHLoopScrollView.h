@@ -36,11 +36,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 @interface YZHLoopScrollView : UIView
 
-//滚动方向上的宽或者高的大小(就是scrollView的宽或者高),默认为scrollView的宽或者高
-//@property (nonatomic, assign) CGFloat scrollPageSize;
-
-/** separatorSpace 为显示页直接的间隔，默认为0 */
+/** separatorSpace 为显示页之间的间隔，默认为0 */
 @property (nonatomic, assign) CGFloat separatorSpace;
+
+@property (nonatomic, strong, readonly) UIScrollView *scrollView;
 
 @property (nonatomic, weak) id<YZHLoopScrollViewDelegate> delegate;
 

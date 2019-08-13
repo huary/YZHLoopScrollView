@@ -22,11 +22,33 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
+/**********************************************************************
+ *YZHLoopTransitionContext
+ ***********************************************************************/
+@interface YZHLoopTransitionContext : NSObject
+
+
+@property (nonatomic, strong, readonly) UIView *transitionContainerView;
+
+@property (nonatomic, assign) CGFloat changedRatio;
+
+@property (nonatomic, strong) UIView *transitionView;
+
+@property (nonatomic, copy) NSDictionary *userInfo;
+
+//默认0.25
+@property (nonatomic, assign) NSTimeInterval animateTimeInterval;
+
+@end
+
+
+/**********************************************************************
+ *YZHLoopTransitionView
+ ***********************************************************************/
 @interface YZHLoopTransitionView : UIView
 
 @property (nonatomic, strong, readonly) YZHLoopScrollView *loopScrollView;
 
-/** <#注释#> */
 @property (nonatomic, weak) id<YZHLoopTransitionViewDelegate> delegate;
 
 @property (nonatomic, assign) BOOL enableTransition;
@@ -36,6 +58,9 @@ NS_ASSUME_NONNULL_BEGIN
 
 //小于minScaleToRemove时松开进行removefromSuperView操作
 @property (nonatomic, assign) CGFloat minScaleToRemove;
+
+#pragma mark public can override
+- (void)panGestureRecognizerAction:(UIPanGestureRecognizer*)panGestureRecognizer;
 
 - (BOOL)panGestureRecognizer:(UIPanGestureRecognizer *)gestureRecognizer shouldRecognizeSimultaneouslyWithGestureRecognizer:(UIPanGestureRecognizer *)otherPanGestureRecognizer;
 

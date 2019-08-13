@@ -47,6 +47,8 @@
 - (void)viewDidLoad {
     [super viewDidLoad];
     
+    self.automaticallyAdjustsScrollViewInsets = NO;
+    
     self.maxIdx = 17;
     self.minIdx = 1;
     [self _test];
@@ -141,6 +143,10 @@
         imageCell.zoomView.image = tmp.image;
         
     };
+    __weak typeof(self) weakSelf = self;
+    cellModel.dismissToImageViewBlock = ^UIImageView *(id<YZHImageCellModelProtocol> model, YZHImageCell *imageCell) {
+        return weakSelf.imageView;
+    };
     return cellModel;
 }
 
@@ -224,7 +230,7 @@
 - (void)_tapAction:(UITapGestureRecognizer*)tap
 {
     self.imageBrowser.separatorSpace = 20;
-//    self.imageBrowser.imageBrowserView.loopScrollView.scrollDirection = YZHLoopViewScrollDirectionVertical;
+    self.imageBrowser.imageBrowserView.loopScrollView.scrollDirection = YZHLoopViewScrollDirectionVertical;
     [self.imageBrowser showInView:nil fromView:(UIImageView*)tap.view withModel:self.showCellModel];
     
 //    self.imageBrowserVC.showCellModel = self.showCellModel;

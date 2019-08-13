@@ -218,12 +218,12 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "YZHLoopScrollViewDemo/ViewController.m"
-            timestampString = "587224328.046068"
+            timestampString = "587350533.2349679"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
             startingLineNumber = "284"
             endingLineNumber = "284"
-            landmarkName = "-imageBrowserViewController:nextModelWithCurrentShowModel:possibleModel:"
+            landmarkName = "-imageBrowser:didLongPressImageCell:"
             landmarkType = "7">
          </BreakpointContent>
       </BreakpointProxy>
@@ -234,12 +234,12 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "YZHLoopScrollViewDemo/ViewController.m"
-            timestampString = "587224328.046141"
+            timestampString = "587350533.235461"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
             startingLineNumber = "289"
             endingLineNumber = "289"
-            landmarkName = "-imageBrowserViewController:prevModelWithCurrentShowModel:possibleModel:"
+            landmarkName = "-imageBrowserViewController:nextModelWithCurrentShowModel:possibleModel:"
             landmarkType = "7">
          </BreakpointContent>
       </BreakpointProxy>

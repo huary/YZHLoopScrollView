@@ -24,7 +24,7 @@ typedef NS_ENUM(NSInteger, _YZHScrollViewDragVector)
  ***********************************************************************/
 @interface YZHLoopScrollView ()<UIScrollViewDelegate>
 
-@property (nonatomic, strong) UIScrollView *scrollView;
+//@property (nonatomic, strong) UIScrollView *scrollView;
 
 @property (nonatomic, strong) NSMutableArray<YZHLoopCell*> *cacheCells;
 
@@ -45,6 +45,8 @@ typedef NS_ENUM(NSInteger, _YZHScrollViewDragVector)
 @end
 
 @implementation YZHLoopScrollView
+
+@synthesize scrollView = _scrollView;
 
 - (instancetype)initWithFrame:(CGRect)frame
 {
