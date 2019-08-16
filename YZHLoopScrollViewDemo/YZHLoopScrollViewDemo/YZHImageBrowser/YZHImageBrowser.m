@@ -135,7 +135,14 @@
 //这个代理方法后会自动给cell设置model
 - (YZHLoopCell *_Nullable)loopScrollView:(YZHLoopScrollView * _Nonnull)loopScrollView cellForModel:(id<YZHLoopCellModelProtocol>_Nullable)model withReusableCell:(YZHLoopCell *_Nullable)reusableCell
 {
-    return [self _updateImageCellWithModel:(id<YZHImageCellModelProtocol>)model reusableCell:(YZHImageCell * _Nullable)reusableCell];
+    id<YZHImageCellModelProtocol> cellModel = (id<YZHImageCellModelProtocol>)model;
+    id<YZHImageCellModelProtocol> currModel = (id<YZHImageCellModelProtocol>)model;
+    id<YZHImageCellModelProtocol> possibleModel = (id<YZHImageCellModelProtocol>)reusableCell.model;
+    if ([self.delegate respondsToSelector:@selector(imageBrowser:newModelWithCurrentShowModel:possibleModel:)]) {
+        cellModel = [self.delegate imageBrowser:self newModelWithCurrentShowModel:currModel possibleModel:possibleModel];
+    }
+
+    return [self _updateImageCellWithModel:(id<YZHImageCellModelProtocol>)cellModel reusableCell:(YZHImageCell * _Nullable)reusableCell];
 }
 
 //这个代理方法后不会给cell设置model,在返回cell的时候，cell的model已经赋值（因为不知道model）

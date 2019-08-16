@@ -250,11 +250,11 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "YZHLoopScrollViewDemo/YZHImageBrowser/YZHImageBrowser.m"
-            timestampString = "587224328.046209"
+            timestampString = "587623399.119302"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "184"
-            endingLineNumber = "184"
+            startingLineNumber = "191"
+            endingLineNumber = "191"
             landmarkName = "-imageCell:didDoubleTap:"
             landmarkType = "7">
          </BreakpointContent>

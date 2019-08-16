@@ -24,6 +24,10 @@ NS_ASSUME_NONNULL_BEGIN
 @protocol YZHImageBrowserDelegate <NSObject>
 
 - (id<YZHImageCellModelProtocol>)imageBrowser:(YZHImageBrowser * _Nonnull)imageBrowser
+                 newModelWithCurrentShowModel:(id<YZHImageCellModelProtocol>_Nullable)currentShowModel
+                                possibleModel:(id<YZHImageCellModelProtocol>_Nullable)possibleModel;
+
+- (id<YZHImageCellModelProtocol>)imageBrowser:(YZHImageBrowser * _Nonnull)imageBrowser
                 nextModelWithCurrentShowModel:(id<YZHImageCellModelProtocol>_Nullable)currentShowModel
                                 possibleModel:(id<YZHImageCellModelProtocol>_Nullable)possibleModel;
 
