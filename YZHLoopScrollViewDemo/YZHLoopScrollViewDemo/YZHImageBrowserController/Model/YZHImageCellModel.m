@@ -10,27 +10,13 @@
 
 @implementation YZHImageCellModel
 
-- (void)updateCellModelUpdateBlockWithCellDelegate:(id<YZHImageCustomCellDelegate>)delegate
-{
-    __weak typeof(delegate) weakDelegate = delegate;
-    if (self.updateBlock) {
-        YZHImageCellUpdateBlock updageBlock = self.updateBlock;
-        self.updateBlock = ^(id<YZHImageCellModelProtocol> model, YZHImageCell *imageCell) {
-            updageBlock(model, imageCell);
-            YZHImageCustomCell *cell = (YZHImageCustomCell*)imageCell;
-//            imageCell.delegate = weakDelegate;
-            cell.customCellDelegate = weakDelegate;
-        };
-    }
-    else {
-        self.updateBlock = ^(id<YZHImageCellModelProtocol> model, YZHImageCell *imageCell) {
-            YZHImageCellModel *cellModel = (YZHImageCellModel*)model;
-            imageCell.zoomView.image = cellModel.image;
-            YZHImageCustomCell *cell = (YZHImageCustomCell*)imageCell;
-//            imageCell.delegate = weakDelegate;
-            cell.customCellDelegate = weakDelegate;
-        };
-    }
-}
+//+ (BOOL)isImageCell:(YZHImageCell*)imageCell bindWithThisTarget:(id)target
+//{
+//    YZHImageCellModel *cellModel = (YZHImageCellModel*)imageCell.model;
+//    if (cellModel.bindImageCell == imageCell && cellModel.target == target) {
+//        return YES;
+//    }
+//    return NO;
+//}
 
 @end

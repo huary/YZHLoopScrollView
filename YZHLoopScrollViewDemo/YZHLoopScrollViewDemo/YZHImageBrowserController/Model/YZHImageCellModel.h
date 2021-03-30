@@ -6,9 +6,7 @@
 //  Copyright © 2019 yuan. All rights reserved.
 //
 
-#import <Foundation/Foundation.h>
-#import "YZHImageCellModelProtocol.h"
-#import "YZHImageCustomCell.h"
+#import "YZHImageBrowser.h"
 
 NS_ASSUME_NONNULL_BEGIN
 
@@ -16,18 +14,16 @@ NS_ASSUME_NONNULL_BEGIN
 
 @property (nonatomic, copy) YZHImageCellUpdateBlock updateBlock;
 
-@property (nonatomic, copy) YZHImageCellUpdateBlock didUpdateBlock;
+//该model绑定的cell
+@property (nonatomic, weak) YZHImageCell *bindImageCell;
 
-@property (nonatomic, copy) YZHImageCellDismissToImageViewBlock dismissToImageViewBlock;
+/** imageView的contentMode */
+@property (nonatomic, assign) UIViewContentMode imageViewContentMode;
 
-@property (nonatomic, copy) NSString *imageName;
-
-@property (nonatomic, strong) UIImage *image;
+/** 是否已经到尽头 */
+@property (nonatomic, assign) BOOL isEnd;
 
 @property (nonatomic, strong) id target;
-
-- (void)updateCellModelUpdateBlockWithCellDelegate:(id<YZHImageCustomCellDelegate>)delegate;
-
 
 @end
 

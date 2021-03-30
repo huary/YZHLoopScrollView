@@ -14,15 +14,14 @@
 
 typedef void(^YZHImageCellUpdateBlock)(id<YZHImageCellModelProtocol> model, YZHImageCell *imageCell);
 
-typedef UIImageView*(^YZHImageCellDismissToImageViewBlock)(id<YZHImageCellModelProtocol> model, YZHImageCell *imageCell);
-
-
 @protocol YZHImageCellModelProtocol <YZHLoopCellModelProtocol>
 
 @property (nonatomic, copy) YZHImageCellUpdateBlock updateBlock;
 
-@property (nonatomic, copy) YZHImageCellUpdateBlock didUpdateBlock;
+//该model绑定的cell
+@property (nonatomic, weak) YZHImageCell *bindImageCell;
 
-@property (nonatomic, copy) YZHImageCellDismissToImageViewBlock dismissToImageViewBlock;
+/** imageView的contentMode */
+@property (nonatomic, assign) UIViewContentMode imageViewContentMode;
 
 @end

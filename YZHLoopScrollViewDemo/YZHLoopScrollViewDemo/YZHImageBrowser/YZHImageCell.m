@@ -21,7 +21,7 @@
 {
     self = [super initWithFrame:frame];
     if (self) {
-        [self _setupImageCellChildView];
+        [self pri_setupImageCellChildView];
     }
     return self;
 }
@@ -40,58 +40,63 @@
     self.zoomView.frame = self.contentView.bounds;
 }
 
-- (void)_setupImageCellChildView
+- (void)pri_setupImageCellChildView
 {
     [self.contentView addSubview:self.zoomView];
     
-    UITapGestureRecognizer *tap = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(_tapAction:)];
+    UITapGestureRecognizer *tap = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(pri_tapAction:)];
     [self addGestureRecognizer:tap];
 
-    UITapGestureRecognizer *doubleTap = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(_doubleTapAction:)];
+    UITapGestureRecognizer *doubleTap = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(pri_doubleTapAction:)];
     doubleTap.numberOfTapsRequired = 2;
     [tap requireGestureRecognizerToFail:doubleTap];
     [self addGestureRecognizer:doubleTap];
 
 
-    UILongPressGestureRecognizer *longPress = [[UILongPressGestureRecognizer alloc] initWithTarget:self action:@selector(_longPressAction:)];
+    UILongPressGestureRecognizer *longPress = [[UILongPressGestureRecognizer alloc] initWithTarget:self action:@selector(pri_longPressAction:)];
     [self addGestureRecognizer:longPress];
 }
 
 - (void)setModel:(id)model
 {
     [super setModel:model];
-    [self _updateZoomImageView];
+    [self pri_updateZoomImageView];
 }
 
-- (void)_updateZoomImageView
+- (void)pri_updateZoomImageView
 {
     id<YZHImageCellModelProtocol> cellModel = (id<YZHImageCellModelProtocol>)self.model;
+    cellModel.bindImageCell = self;
+    self.zoomView.imageView.contentMode = cellModel.imageViewContentMode;
     if ([cellModel respondsToSelector:@selector(updateBlock)] && cellModel.updateBlock) {
         cellModel.updateBlock(cellModel, self);
     }
 }
 
 
-- (void)_tapAction:(UITapGestureRecognizer *)tapGesture
+- (void)pri_tapAction:(UITapGestureRecognizer *)tapGesture
 {
     if ([self.delegate respondsToSelector:@selector(imageCell:didTap:)]) {
         [self.delegate imageCell:self didTap:tapGesture];
     }
 }
 
-- (void)_doubleTapAction:(UITapGestureRecognizer *)doubleTap
+- (void)pri_doubleTapAction:(UITapGestureRecognizer *)doubleTap
 {
     if ([self.delegate respondsToSelector:@selector(imageCell:didDoubleTap:)]) {
         [self.delegate imageCell:self didDoubleTap:doubleTap];
     }
 }
 
-- (void)_longPressAction:(UILongPressGestureRecognizer *)longPress
+- (void)pri_longPressAction:(UILongPressGestureRecognizer *)longPress
 {
     if ([self.delegate respondsToSelector:@selector(imageCell:didLongPress:)]) {
         [self.delegate imageCell:self didLongPress:longPress];
     }
 }
 
-
+- (void)updateWithImage:(UIImage * _Nullable)image
+{
+    self.zoomView.image = image;
+}
 @end

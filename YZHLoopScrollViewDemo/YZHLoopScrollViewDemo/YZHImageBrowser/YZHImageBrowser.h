@@ -19,27 +19,55 @@ typedef NS_OPTIONS(NSInteger, YZHImageBrowserActionOptions)
 };
 
 NS_ASSUME_NONNULL_BEGIN
-
 @class YZHImageBrowser;
 @protocol YZHImageBrowserDelegate <NSObject>
 
-- (id<YZHImageCellModelProtocol>)imageBrowser:(YZHImageBrowser * _Nonnull)imageBrowser
-                 newModelWithCurrentShowModel:(id<YZHImageCellModelProtocol>_Nullable)currentShowModel
-                                possibleModel:(id<YZHImageCellModelProtocol>_Nullable)possibleModel;
+- (id<YZHImageCellModelProtocol> _Nullable)imageBrowser:(YZHImageBrowser * _Nonnull)imageBrowser
+                           newModelWithCurrentShowModel:(id<YZHImageCellModelProtocol>_Nullable)currentShowModel
+                                          possibleModel:(id<YZHImageCellModelProtocol>_Nullable)possibleModel;
 
-- (id<YZHImageCellModelProtocol>)imageBrowser:(YZHImageBrowser * _Nonnull)imageBrowser
-                nextModelWithCurrentShowModel:(id<YZHImageCellModelProtocol>_Nullable)currentShowModel
-                                possibleModel:(id<YZHImageCellModelProtocol>_Nullable)possibleModel;
+- (id<YZHImageCellModelProtocol> _Nullable)imageBrowser:(YZHImageBrowser * _Nonnull)imageBrowser
+                          nextModelWithCurrentShowModel:(id<YZHImageCellModelProtocol>_Nullable)currentShowModel
+                                          possibleModel:(id<YZHImageCellModelProtocol>_Nullable)possibleModel;
 
-- (id<YZHImageCellModelProtocol>)imageBrowser:(YZHImageBrowser * _Nonnull)imageBrowser
-                prevModelWithCurrentShowModel:(id<YZHImageCellModelProtocol>_Nullable)currentShowModel
-                                possibleModel:(id<YZHImageCellModelProtocol>_Nullable)possibleModel;
+- (id<YZHImageCellModelProtocol> _Nullable)imageBrowser:(YZHImageBrowser * _Nonnull)imageBrowser
+                          prevModelWithCurrentShowModel:(id<YZHImageCellModelProtocol>_Nullable)currentShowModel
+                                          possibleModel:(id<YZHImageCellModelProtocol>_Nullable)possibleModel;
 
 - (void)imageBrowser:(YZHImageBrowser * _Nonnull)imageBrowser didTapImageCell:(YZHImageCell *)imageCell;
 
 - (void)imageBrowser:(YZHImageBrowser * _Nonnull)imageBrowser didDoubleTapImageCell:(YZHImageCell *)imageCell;
 
 - (void)imageBrowser:(YZHImageBrowser * _Nonnull)imageBrowser didLongPressImageCell:(YZHImageCell *)imageCell;
+
+- (void)imageBrowserDidDismiss:(YZHImageBrowser * _Nonnull)imageBrowser;
+@end
+
+
+@class YZHImageBrowserAnimationContext;
+typedef void(^YZHImageBrowserWillAnimateBlock)(YZHImageBrowser *imageBrowser,YZHImageBrowserAnimationContext *context);
+typedef void(^YZHImageBrowserAnimationBlock)(YZHImageBrowser *imageBrowser,YZHImageBrowserAnimationContext *context);
+typedef void(^YZHImageBrowserDidAnimateBlock)(YZHImageBrowser *imageBrowser,YZHImageBrowserAnimationContext *context);
+
+@interface YZHImageBrowserAnimationContext : NSObject
+/** 这个是showInView传进来的showInView */
+@property (nonatomic, strong) UIView *showInView;
+
+/** 需要在willAnimateBlock时赋值的 */
+@property (nonatomic, strong) UIView *animationView;
+
+/** 需要在willAnimateBlock时赋值的 */
+@property (nonatomic, assign) CGRect animationViewEndFrame;
+
+/** <#注释#> */
+@property (nonatomic, copy) YZHImageBrowserWillAnimateBlock willAnimateBlock;
+
+/** <#注释#> */
+@property (nonatomic, copy) YZHImageBrowserAnimationBlock animationBlock;
+
+/** <#注释#> */
+@property (nonatomic, copy) YZHImageBrowserDidAnimateBlock didAnimateBlock;
+
 @end
 
 @interface YZHImageBrowser : NSObject
@@ -54,7 +82,9 @@ NS_ASSUME_NONNULL_BEGIN
 
 @property (nonatomic, assign) CGFloat separatorSpace;
 
-@property (nonatomic, assign) NSTimeInterval animateTimeInterval;
+@property (nonatomic, assign) NSTimeInterval animateDuration;
+
+@property (nonatomic, assign) UIViewAnimationOptions animationOptions;
 
 /*默认为-1，（YZHImageBrowserActionOptionsSingleTapDismiss|YZHImageBrowserActionOptionsDoubleTapZoomScale） */
 @property (nonatomic, assign) YZHImageBrowserActionOptions actionOptions;
@@ -62,11 +92,21 @@ NS_ASSUME_NONNULL_BEGIN
 //默认为YZHImageCell,自定义需要继承自YZHImageCell
 @property (nonatomic, assign) Class imageCellClass;
 
+- (UIView *)showInView;
 
+- (UIView *)fromView;
 
 - (YZHImageCell*)currentShowCell;
 
-- (void)showInView:(UIView * _Nullable)showInView fromView:(UIImageView * _Nullable)fromView withModel:(id<YZHImageCellModelProtocol>)model;
+- (void)showInView:(UIView * _Nullable)showInView
+          fromView:(UIView * _Nullable)fromView
+             image:(UIImage * _Nullable)image
+         withModel:(id<YZHImageCellModelProtocol>)model;
+
+- (void)showInView:(UIView * _Nullable)showInView
+          fromView:(UIView * _Nullable)fromView
+         withModel:(id<YZHImageCellModelProtocol>)model
+  animationContext:(YZHImageBrowserAnimationContext *)animationContext;
 
 - (void)dismiss;
 @end

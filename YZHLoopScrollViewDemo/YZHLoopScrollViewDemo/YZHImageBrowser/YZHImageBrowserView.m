@@ -39,13 +39,20 @@
 @end
 
 @implementation YZHImageBrowserView
+@dynamic delegate;
 
 - (instancetype)initWithFrame:(CGRect)frame
 {
     self = [super initWithFrame:frame];
     if (self) {
+        [self pri_setupImageBrowserView];
     }
     return self;
+}
+
+- (void)pri_setupImageBrowserView
+{
+    
 }
 
 - (YZHLoopTransitionContext*)panContext
@@ -56,7 +63,7 @@
     return _panContext;
 }
 
-- (CGFloat)_changedValueForPoint:(CGPoint)point
+- (CGFloat)pri_changedValueForPoint:(CGPoint)point
 {
     CGFloat translation = 0;
     CGFloat maxTranslation = self.bounds.size.height/2;
@@ -96,7 +103,10 @@
         CGSize cellImageSize = cellImageView.bounds.size;
 
         loc = [panGesture locationInView:cellImageView];
-        CGPoint imgAnchorPoint = CGPointMake(loc.x/cellImageSize.width, loc.y/cellImageSize.height);
+        CGPoint imgAnchorPoint = CGPointMake(0.5, 0.5);
+        if (cellImageSize.width > 0 && cellImageSize.height > 0) {
+            imgAnchorPoint = CGPointMake(loc.x/cellImageSize.width, loc.y/cellImageSize.height);
+        }
 #if USE_IMAGEVIEW_TO_PAN
         CGRect imgFrame = [cellImageView.superview convertRect:cellImageView.frame toView:self];
         //不要用initWithFrame 来初始化，用如下：
@@ -122,7 +132,7 @@
         }
     }
     else if (panGesture.state == UIGestureRecognizerStateChanged) {
-        CGFloat changedValue = [self _changedValueForPoint:point];
+        CGFloat changedValue = [self pri_changedValueForPoint:point];
         CGFloat ratio = 1.0 - changedValue;
 
         ratio = fmax(self.minScale, ratio);
@@ -146,8 +156,6 @@
 
         YZHImageCell *cell = self.panContext.transitionCell;
         
-        id<YZHImageCellModelProtocol> cellModel = (id<YZHImageCellModelProtocol>)cell.model;
-
         UIView *transformView = nil;
         UIView *toView = nil;
 #if USE_IMAGEVIEW_TO_PAN
@@ -159,15 +167,15 @@
         toView = cell.zoomView.scrollView;
 #endif
         
-        void (^completion)(BOOL finished) = ^(BOOL finished) {
+        void (^completion)(BOOL finished, BOOL dismiss) = ^(BOOL finished, BOOL dismiss) {
             self.loopScrollView.hidden = NO;
             cell.zoomView.scrollView.scrollEnabled = YES;
             self.loopScrollView.scrollView.scrollEnabled = YES;
             [self.panContext.transitionContainerView removeFromSuperview];
             self.panContext = nil;
             
-            if ([self.delegate respondsToSelector:@selector(transitionView:didDismissAtPoint:changedValue:)]) {
-                CGFloat changedValue = [self _changedValueForPoint:point];
+            if (dismiss && [self.delegate respondsToSelector:@selector(transitionView:didDismissAtPoint:changedValue:)]) {
+                CGFloat changedValue = [self pri_changedValueForPoint:point];
                 [self.delegate transitionView:self didDismissAtPoint:loc changedValue:changedValue];
             }
         };
@@ -175,20 +183,16 @@
         if (self.panContext.changedRatio < self.minScaleToRemove) {
             
             CGSize transitionContainerViewSize = self.panContext.transitionContainerView.bounds.size;
-            
-            UIImageView *toImgView = nil;
-            if ([cellModel respondsToSelector:@selector(dismissToImageViewBlock)] && cellModel.dismissToImageViewBlock) {
-                toImgView = cellModel.dismissToImageViewBlock(cellModel, cell);
-            }
+
             CGRect toRect = CGRectMake(transitionContainerViewSize.width/2, transitionContainerViewSize.height/2, 0, 0);
-            if (toImgView) {
-                toRect = [toImgView.superview convertRect:toImgView.frame toView:toView];
+            if ([self.delegate respondsToSelector:@selector(imageBrowserView:dismissToFrameForCell:)]) {
+                toRect = [self.delegate imageBrowserView:self dismissToFrameForCell:cell];
             }
             [UIView animateWithDuration:self.panContext.animateTimeInterval animations:^{
                 self.alpha = 0;
                 transformView.frame = toRect;
             } completion:^(BOOL finished) {
-                completion(finished);
+                completion(finished, YES);
                 [self removeFromSuperview];
             }];
         }
@@ -197,7 +201,7 @@
                 self.alpha = 1.0;
                 transformView.transform = CGAffineTransformIdentity;
             } completion:^(BOOL finished) {
-                completion(finished);
+                completion(finished, NO);
             }];
         }
     }
@@ -219,6 +223,12 @@
     
     CGPoint ts = [panGestureRecognizer translationInView:panGestureRecognizer.view];
     YZHImageCell *currentShowCell = (YZHImageCell*)self.loopScrollView.currentShowCell;
+    if (![currentShowCell isKindOfClass:[YZHImageCell class]]) {
+        return NO;
+    }
+    if (currentShowCell.zoomView.scrollView.isZooming) {
+        return NO;
+    }
     
     UIScrollView *scrollView = currentShowCell.zoomView.scrollView;
     CGSize size = scrollView.bounds.size;

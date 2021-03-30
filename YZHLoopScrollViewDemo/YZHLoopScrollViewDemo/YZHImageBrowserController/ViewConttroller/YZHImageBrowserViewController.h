@@ -6,40 +6,37 @@
 //  Copyright © 2019 yuan. All rights reserved.
 //
 
-#import <UIKit/UIKit.h>
-#import "YZHImageCellModel.h"
-
-typedef NS_ENUM(NSInteger, ZYImageBrowseButtonType)
-{
-    ZYImageBrowseButtonTypeSend = 0,
-    ZYImageBrowseButtonTypeSave = 1,
-};
-
-@class YZHImageBrowserViewController;
-@protocol YZHImageBrowserViewControllerDelegate <NSObject>
-
-- (YZHImageCellModel *_Nullable)imageBrowserViewController:(YZHImageBrowserViewController * _Nonnull)imageBrowserViewController nextModelWithCurrentShowModel:(YZHImageCellModel * _Nullable)currentShowModel possibleModel:(YZHImageCellModel *_Nullable)possibleModel;
-
-- (YZHImageCellModel *_Nullable)imageBrowserViewController:(YZHImageBrowserViewController * _Nonnull)imageBrowserViewController prevModelWithCurrentShowModel:(YZHImageCellModel * _Nullable)currentShowModel possibleModel:(YZHImageCellModel *_Nullable)possibleModel;
-
-- (void)imageBrowserViewController:(YZHImageBrowserViewController * _Nonnull)imageBrowserViewController didClickButton:(UIButton *_Nonnull)button;
-
-@end
+#import <Foundation/Foundation.h>
+#import "YZHImageBrowser.h"
 
 NS_ASSUME_NONNULL_BEGIN
 
-@interface YZHImageBrowserViewController : UIViewController
+@class YZHImageBrowserController;
+typedef void(^YZHImageBrowserControllerFetchCompletionBlock)(id currModel, BOOL next, NSArray *list);
+//在主线程调用fetchCompletionBlock
+typedef void(^YZHImageBrowserControllerFetchBlock)(id currModel, BOOL next, YZHImageBrowserControllerFetchCompletionBlock fetchCompletionBlock);
 
-@property (nonatomic, weak) id<YZHImageBrowserViewControllerDelegate> delegate;
+typedef void(^YZHImageBrowserControllerUpdateCellBlock)(id model, YZHImageCell *imageCell);
 
-//默认20
-@property (nonatomic, assign) CGFloat separatorSpace;
+typedef void(^YZHImageBrowserControllerDismissBlock)(YZHImageBrowserController *imageBrowserController);
 
-@property (nonatomic, strong) YZHImageCellModel *showCellModel;
+@interface YZHImageBrowserController : NSObject
 
-@property (nonatomic, assign) ZYImageBrowseButtonType buttonType;
+//如果只有一张图片可以展示的话，可以为nil
+@property (nonatomic, copy, nullable) YZHImageBrowserControllerFetchBlock fetchBlock;
 
+@property (nonatomic, copy, nullable) YZHImageBrowserControllerUpdateCellBlock updateCellBlock;
 
+@property (nonatomic, copy, nullable) YZHImageBrowserControllerDismissBlock dismissBlock;
+
+- (YZHImageBrowser *)imageBrowser;
+
+- (void)showInView:(UIView *_Nullable)inView
+          fromView:(UIView *_Nullable)fromView
+             image:(UIImage *_Nullable)image
+             model:(id _Nullable)model;
+
+- (void)dismiss;
 
 @end
 

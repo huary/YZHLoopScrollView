@@ -7,10 +7,22 @@
 //
 
 #import "YZHLoopTransitionView.h"
+#import "YZHImageCell.h"
 
 NS_ASSUME_NONNULL_BEGIN
 
+@class YZHImageBrowserView;
+@protocol YZHImageBrowserViewDelegate <YZHLoopTransitionViewDelegate>
+
+//返回dismiss时，要消失的frame，相对于ImageBrowserView的frame
+@optional
+- (CGRect)imageBrowserView:(YZHImageBrowserView *_Nonnull)imageBrowserView dismissToFrameForCell:(YZHImageCell *)imageCell;
+
+@end
+
 @interface YZHImageBrowserView : YZHLoopTransitionView
+
+@property (nonatomic, weak) id<YZHImageBrowserViewDelegate> delegate;
 
 @end
 

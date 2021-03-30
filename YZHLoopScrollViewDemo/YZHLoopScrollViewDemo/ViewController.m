@@ -12,15 +12,17 @@
 #import "YZHImageCellModel.h"
 #import "YZHImageBrowserViewController.h"
 
+#import "YZHLoopCustomCell.h"
+#import "YZHLoopCustomCellModel.h"
 
 
-@interface ViewController ()<YZHImageBrowserDelegate, YZHImageBrowserViewControllerDelegate>
+@interface ViewController ()<YZHImageBrowserDelegate, YZHImageBrowserViewControllerDelegate,YZHLoopScrollViewDelegate>
 
-//@property (nonatomic, strong) YZHLoopScrollView *loopScrollView;
-//
-//@property (nonatomic, strong) YZHLoopCustomCellModel *cellModel;
-//
-//@property (nonatomic, assign) NSInteger limit;
+@property (nonatomic, strong) YZHLoopScrollView *loopScrollView;
+
+@property (nonatomic, strong) YZHLoopCustomCellModel *cellModel;
+
+@property (nonatomic, assign) NSInteger limit;
 
 @property (nonatomic, strong) YZHImageBrowser *imageBrowser;
 
@@ -39,6 +41,10 @@
 @property (nonatomic, strong) YZHImageBrowserViewController *imageBrowserVC;
 
 
+/** <#注释#> */
+@property (nonatomic, strong) NSTimer *timer;
+
+
 
 @end
 
@@ -49,30 +55,29 @@
     
     self.automaticallyAdjustsScrollViewInsets = NO;
     
+    self.limit = 1;
     self.maxIdx = 17;
     self.minIdx = 1;
     [self _test];
-//    self.limit = 100;
 }
 
-//-(YZHLoopScrollView*)loopScrollView
-//{
-//    if (_loopScrollView == nil) {
-//        _loopScrollView = [[YZHLoopScrollView alloc] initWithFrame:CGRectMake(0, 0, self.view.bounds.size.width, self.view.bounds.size.height)];
-////        _loopScrollView.scrollPageSize =
-//        _loopScrollView.delegate = self;
-//    }
-//    return _loopScrollView;
-//}
-//
-//- (YZHLoopCustomCellModel*)cellModel
-//{
-//    if (_cellModel == nil) {
-//        _cellModel = [YZHLoopCustomCellModel new];
-//        _cellModel.text = @"0";
-//    }
-//    return _cellModel;
-//}
+-(YZHLoopScrollView*)loopScrollView
+{
+    if (_loopScrollView == nil) {
+        _loopScrollView = [[YZHLoopScrollView alloc] initWithFrame:CGRectMake(0, 0, self.view.bounds.size.width, self.view.bounds.size.height)];
+        _loopScrollView.delegate = self;
+    }
+    return _loopScrollView;
+}
+
+- (YZHLoopCustomCellModel*)cellModel
+{
+    if (_cellModel == nil) {
+        _cellModel = [YZHLoopCustomCellModel new];
+        _cellModel.text = @"0";
+    }
+    return _cellModel;
+}
 
 - (YZHImageBrowser*)imageBrowser
 {
@@ -230,7 +235,7 @@
 - (void)_tapAction:(UITapGestureRecognizer*)tap
 {
     self.imageBrowser.separatorSpace = 20;
-    self.imageBrowser.imageBrowserView.loopScrollView.scrollDirection = YZHLoopViewScrollDirectionVertical;
+    self.imageBrowser.imageBrowserView.loopScrollView.scrollDirection = YZHLoopViewScrollDirectionHorizontal;
     [self.imageBrowser showInView:nil fromView:(UIImageView*)tap.view withModel:self.showCellModel];
     
 //    self.imageBrowserVC.showCellModel = self.showCellModel;

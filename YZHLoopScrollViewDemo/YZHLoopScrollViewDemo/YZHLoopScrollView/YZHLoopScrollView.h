@@ -31,6 +31,10 @@ NS_ASSUME_NONNULL_BEGIN
 //这个代理方法后不会给cell设置model,在返回cell的时候，cell的model已经赋值（因为不知道model）
 -(YZHLoopCell *_Nullable)loopScrollView:(YZHLoopScrollView * _Nonnull)loopScrollView prevCellWithCurrentShowModel:(id<YZHLoopCellModelProtocol>_Nullable)currentShowModel withReusableCell:(YZHLoopCell *_Nullable)reusableCell;
 
+- (void)loopScrollViewWillBeginDragging:(YZHLoopScrollView * _Nonnull)loopScrollView;
+
+- (void)loopScrollViewDidEndDragging:(YZHLoopScrollView * _Nonnull)loopScrollView willDecelerate:(BOOL)decelerate;
+
 @end
 
 

@@ -7,7 +7,6 @@
 //
 
 #import "YZHLoopScrollView.h"
-#import "YZHLoopCustomCellModel.h"
 
 typedef NS_ENUM(NSInteger, _YZHScrollViewDragVector)
 {
@@ -52,7 +51,7 @@ typedef NS_ENUM(NSInteger, _YZHScrollViewDragVector)
 {
     self = [super initWithFrame:frame];
     if (self) {
-        [self _setupLoopScrollViewChildView];
+        [self pri_setupLoopScrollViewChildView];
     }
     return self;
 }
@@ -60,7 +59,7 @@ typedef NS_ENUM(NSInteger, _YZHScrollViewDragVector)
 - (void)layoutSubviews
 {
     [super layoutSubviews];
-    CGRect scrollViewFrame = [self _getScrollViewFrameWithFrame:self.bounds];
+    CGRect scrollViewFrame = [self pri_getScrollViewFrameWithFrame:self.bounds];
     if (!CGRectEqualToRect(self.scrollView.frame, scrollViewFrame)) {
         self.scrollView.frame = scrollViewFrame;
         [self loadViewWithModel:self.cell.model];
@@ -73,6 +72,9 @@ typedef NS_ENUM(NSInteger, _YZHScrollViewDragVector)
         _scrollView = [UIScrollView new];
         _scrollView.delegate = self;
         _scrollView.pagingEnabled = YES;
+        _scrollView.minimumZoomScale = 1.0;
+        _scrollView.maximumZoomScale = 1.0;
+        _scrollView.pinchGestureRecognizer.enabled = NO;
         _scrollView.showsVerticalScrollIndicator = NO;
         _scrollView.showsHorizontalScrollIndicator = NO;
     }
@@ -87,14 +89,14 @@ typedef NS_ENUM(NSInteger, _YZHScrollViewDragVector)
     return _cacheCells;
 }
 
-- (void)_setupLoopScrollViewChildView
+- (void)pri_setupLoopScrollViewChildView
 {
     self.clipsToBounds = YES;
     [self addSubview:self.scrollView];
-    self.scrollView.frame = [self _getScrollViewFrameWithFrame:self.bounds];
+    self.scrollView.frame = [self pri_getScrollViewFrameWithFrame:self.bounds];
 }
 
-- (CGRect)_getScrollViewFrameWithFrame:(CGRect)frame
+- (CGRect)pri_getScrollViewFrameWithFrame:(CGRect)frame
 {
     CGRect retFrame = frame;
     if (self.separatorSpace > 0.0 && frame.size.width > 0.0 && frame.size.height > 0.0) {
@@ -110,7 +112,7 @@ typedef NS_ENUM(NSInteger, _YZHScrollViewDragVector)
     return retFrame;
 }
 
-- (YZHLoopCell*)_reusableCellWithPossibleModel:(id<YZHLoopCellModelProtocol>)possibleModel
+- (YZHLoopCell*)pri_reusableCellWithPossibleModel:(id<YZHLoopCellModelProtocol>)possibleModel
 {
     if (self.cacheCells.count == 0) {
         return nil;
@@ -132,10 +134,10 @@ typedef NS_ENUM(NSInteger, _YZHScrollViewDragVector)
     return cell;
 }
 
-- (YZHLoopCell*)_cellWithModel:(id<YZHLoopCellModelProtocol>)model
+- (YZHLoopCell*)pri_cellWithModel:(id<YZHLoopCellModelProtocol>)model
 {
     YZHLoopCell *cell = nil;
-    YZHLoopCell *reusableCell = [self _reusableCellWithPossibleModel:model];
+    YZHLoopCell *reusableCell = [self pri_reusableCellWithPossibleModel:model];
     if ([self.delegate respondsToSelector:@selector(loopScrollView:cellForModel:withReusableCell:)]) {
         cell = [self.delegate loopScrollView:self cellForModel:model withReusableCell:reusableCell];
         if (cell) {
@@ -158,10 +160,10 @@ typedef NS_ENUM(NSInteger, _YZHScrollViewDragVector)
     return cell;
 }
 
-- (YZHLoopCell*)_nextCell:(BOOL)next withCurrentShowModel:(id<YZHLoopCellModelProtocol>)currentShowModel
+- (YZHLoopCell*)pri_nextCell:(BOOL)next withCurrentShowModel:(id<YZHLoopCellModelProtocol>)currentShowModel
 {
     YZHLoopCell *cell = nil;
-    YZHLoopCell *reusableCell = [self _reusableCellWithPossibleModel:nil];
+    YZHLoopCell *reusableCell = [self pri_reusableCellWithPossibleModel:nil];
     if (next) {
         if ([self.delegate respondsToSelector:@selector(loopScrollView:nextCellWithCurrentShowModel:withReusableCell:)]) {
             cell = [self.delegate loopScrollView:self nextCellWithCurrentShowModel:currentShowModel withReusableCell:reusableCell];
@@ -183,7 +185,7 @@ typedef NS_ENUM(NSInteger, _YZHScrollViewDragVector)
     return cell;
 }
 
-- (void)_adjustCellFrame:(NSInteger)pages
+- (void)pri_adjustCellFrame:(NSInteger)pages
 {
     CGSize size = self.scrollView.bounds.size;
     if (size.width == 0.0 || size.height == 0.0) {
@@ -252,10 +254,10 @@ typedef NS_ENUM(NSInteger, _YZHScrollViewDragVector)
     self.nextCell.contentInsets = contentInsets;
     self.prevCell.contentInsets = contentInsets;
    
-    CGSize csize = self.scrollView.contentSize;
-    CGPoint offset = self.scrollView.contentOffset;
+//    CGSize csize = self.scrollView.contentSize;
+//    CGPoint offset = self.scrollView.contentOffset;
     
-    NSLog(@"offset.x=%f,pages=%ld,w=%f",offset.x,pages,csize.width);
+//    NSLog(@"offset.x=%f,pages=%ld,w=%f",offset.x,pages,csize.width);
 }
 
 #pragma mark UIScrollViewDelegate
@@ -300,6 +302,9 @@ typedef NS_ENUM(NSInteger, _YZHScrollViewDragVector)
 - (void)scrollViewWillBeginDragging:(UIScrollView *)scrollView
 {
     self.dragFromOffset = scrollView.contentOffset;
+    if ([self.delegate respondsToSelector:@selector(loopScrollViewWillBeginDragging:)]) {
+        [self.delegate loopScrollViewWillBeginDragging:self];
+    }
 }
 
 
@@ -351,55 +356,22 @@ typedef NS_ENUM(NSInteger, _YZHScrollViewDragVector)
             dragVector = _YZHScrollViewDragVectorNone;
         }
     }
-    NSLog(@"from.x=%f,to.x=%f,vector=%ld",self.dragFromOffset.x,self.dragToOffset.x,dragVector);
+//    NSLog(@"from.x=%f,to.x=%f,vector=%ld",self.dragFromOffset.x,self.dragToOffset.x,dragVector);
     self.dragVector = dragVector;
 }
 
-//- (void)scrollViewWillBeginDecelerating:(UIScrollView *)scrollView
-//{
-//
-//}
-//
-//- (void)scrollViewDidEndDecelerating:(UIScrollView *)scrollView
-//{
-//
-//}
-
-//- (void)scrollViewDidEndDecelerating:(UIScrollView *)scrollView
-//{
-//    CGSize size = scrollView.bounds.size;
-//    if (size.width == 0 || size.height == 0) {
-//        return;
-//    }
-//
-//    CGPoint contentOffset = scrollView.contentOffset;
-//    NSLog(@"contentOffset.x=%f",contentOffset.x);
-//    NSInteger curIndex = 0;
-//    NSInteger pageIndex = self.pageIndex;
-//    if (self.scrollDirection == YZHLoopViewScrollDirectionHorizontal) {
-//        curIndex = contentOffset.x / size.width;
-//    }
-//    else {
-//        curIndex = contentOffset.y / size.height;
-//    }
-//
-//    if (curIndex != pageIndex) {
-//        id<YZHLoopCellModelProtocol> model = self.cell.model;
-//        if (curIndex > pageIndex) {
-//            model = self.nextCell.model;
-//        }
-//        else {
-//            model = self.prevCell.model;
-//        }
-//        [self _loadView:model];
-//    }
-//}
+- (void)scrollViewDidEndDragging:(UIScrollView *)scrollView willDecelerate:(BOOL)decelerate
+{
+    if ([self.delegate respondsToSelector:@selector(loopScrollViewDidEndDragging:willDecelerate:)]) {
+        [self.delegate loopScrollViewDidEndDragging:self willDecelerate:decelerate];
+    }
+}
 
 #pragma mark public
 - (void)setSeparatorSpace:(CGFloat)separatorSpace
 {
     _separatorSpace = separatorSpace;
-    self.scrollView.frame = [self _getScrollViewFrameWithFrame:self.bounds];
+    self.scrollView.frame = [self pri_getScrollViewFrameWithFrame:self.bounds];
     [self loadViewWithModel:self.cell.model];
 }
 
@@ -427,28 +399,28 @@ typedef NS_ENUM(NSInteger, _YZHScrollViewDragVector)
     
     //按如下（cell,prev,next）顺序add
     NSInteger pages = 0;
-    YZHLoopCell *cell = [self _cellWithModel:model];
+    YZHLoopCell *cell = [self pri_cellWithModel:model];
     if (cell) {
         ++pages;
         [self.scrollView addSubview:cell];
     }
     self.cell = cell;
     
-    YZHLoopCell *prevCell = [self _nextCell:NO withCurrentShowModel:model];
+    YZHLoopCell *prevCell = [self pri_nextCell:NO withCurrentShowModel:model];
     if (prevCell) {
         ++pages;
         [self.scrollView addSubview:prevCell];
     }
     self.prevCell = prevCell;
     
-    YZHLoopCell *nextCell = [self _nextCell:YES withCurrentShowModel:model];
+    YZHLoopCell *nextCell = [self pri_nextCell:YES withCurrentShowModel:model];
     if (nextCell) {
         ++pages;
         [self.scrollView addSubview:nextCell];
     }
     self.nextCell = nextCell;
     
-    [self _adjustCellFrame:pages];
+    [self pri_adjustCellFrame:pages];
     
     self.scrollView.delegate = delegate;
 }
@@ -468,6 +440,7 @@ typedef NS_ENUM(NSInteger, _YZHScrollViewDragVector)
     }
     
     [self loadViewWithModel:model];
+    self.dragVector = _YZHScrollViewDragVectorNone;
 }
 
 - (void)reloadData

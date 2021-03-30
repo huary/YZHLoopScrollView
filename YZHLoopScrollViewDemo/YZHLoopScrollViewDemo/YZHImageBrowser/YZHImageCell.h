@@ -10,6 +10,7 @@
 #import "YZHZoomView.h"
 
 
+NS_ASSUME_NONNULL_BEGIN
 @class YZHImageCell;
 @protocol YZHImageCellDelegate <NSObject>
 
@@ -22,13 +23,13 @@
 
 @end
 
-NS_ASSUME_NONNULL_BEGIN
-
 @interface YZHImageCell : YZHLoopCell
 
 @property (nonatomic, weak) id<YZHImageCellDelegate> delegate;
 
 @property (nonatomic, strong, readonly) YZHZoomView *zoomView;
+
+- (void)updateWithImage:(UIImage * _Nullable)image;
 
 @end
 
